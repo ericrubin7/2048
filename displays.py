@@ -1,5 +1,5 @@
 import time
-
+from collections import defaultdict
 
 class SummaryDisplay(object):
     def __init__(self):
@@ -8,6 +8,7 @@ class SummaryDisplay(object):
         self.highest_tile = []
         self.game_durations = []
         self.game_start_time = None
+        self.outcomes = defaultdict(lambda:0)
 
     def initialize(self, initial_state):
         self.game_start_time = time.time()
@@ -19,7 +20,8 @@ class SummaryDisplay(object):
             print("score: %s\nhighest tile: %s\ngame_duration: %s" % (new_state.score, new_state.board.max(),
                                                                       game_duration))
             self.scores.append(new_state.score)
-            self.highest_tile.append(new_state.board.max())
+            self.highest_tile.append(new_state.max_tile)
+            self.outcomes[new_state.max_tile] += 1
             self.game_durations.append(game_duration)
 
     def mainloop_iteration(self):
@@ -32,3 +34,4 @@ class SummaryDisplay(object):
         print("highest tile: %s" % self.highest_tile)
         print("game_durations: %s" % self.game_durations)
         print("win rate: %s" % win_rate)
+        print("outcomes: %s" % self.outcomes)
