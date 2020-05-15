@@ -4,3 +4,6 @@ README.txt
 docs/
 layouts/
 projects.css
+*.zip
+*.pdf
+__pycache__/
