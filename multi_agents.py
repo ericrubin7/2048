@@ -51,10 +51,10 @@ class ReflexAgent(Agent):
         board = successor_game_state.board
         max_tile = successor_game_state.max_tile
         score = successor_game_state.score
-        score_benefit = score ** (1/2)*2
+        score_benefit = score/10
         max_tile_benefit = max_tile*2
         score += np.count_nonzero(board == 0) * score_benefit
-        score += max_tile_benefit
+        score += np.count_nonzero(board == 0) * max_tile_benefit
         return score
 
 
