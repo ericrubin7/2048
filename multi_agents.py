@@ -2,6 +2,11 @@ import numpy as np
 import abc
 import util
 from game import Agent, Action
+from math import inf
+
+
+SCORE = 0
+ACTION = 1
 
 
 class ReflexAgent(Agent):
@@ -111,8 +116,33 @@ class MinmaxAgent(MultiAgentSearchAgent):
         game_state.generate_successor(agent_index, action):
             Returns the successor game state after an agent takes an action
         """
-        """*** YOUR CODE HERE ***"""
-        util.raiseNotDefined()
+
+        return self.minimax(game_state, self.depth, True)[ACTION]
+
+    def minimax(self, state, depth, maximizing_player):
+        if depth == 0:
+            return self.evaluation_function(state), None
+        legal_moves = state.get_legal_actions(int(maximizing_player))
+        if maximizing_player:
+            max_value = -inf
+            argmax_action = None
+            for action in legal_moves:
+                child_state = state.generate_successor(action=action)
+                value = self.minimax(child_state, depth, not maximizing_player)[SCORE]
+                if value > max_value:
+                    max_value = value
+                    argmax_action = action
+            return max_value, argmax_action
+        else:
+            min_value = inf
+            argmin_action = None
+            for action in legal_moves:
+                child_state = state.generate_successor(action=action)
+                value = self.minimax(child_state, depth - 1, not maximizing_player)[SCORE]
+                if value < min_value:
+                    min_value = value
+                    argmin_action = action  # actually we're not interested in it
+            return min_value, argmin_action
 
 
 
