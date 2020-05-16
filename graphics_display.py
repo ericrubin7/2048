@@ -268,7 +268,7 @@ class GabrieleCirulli2048GraphicsDisplay(TK.Tk):
         elif action is Action.STOP:
             pass
         else:
-            raise Exception("Got unknown action.")
+            raise Exception(f"Got unknown action: {action}")
         self.grid.insert_tile(opponent_action.row, opponent_action.column, opponent_action.value)
         self.mainloop_iteration()
 
