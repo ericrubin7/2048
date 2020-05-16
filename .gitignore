@@ -7,3 +7,4 @@ projects.css
 *.zip
 *.pdf
 __pycache__/
+.idea/
