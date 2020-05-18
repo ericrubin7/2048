@@ -97,7 +97,27 @@ class MultiAgentSearchAgent(Agent):
     def get_action(self, game_state):
         return
 
-    def minimax(self, state, depth, maximizing_player, alpha_beta=True):
+class MinmaxAgent(MultiAgentSearchAgent):
+    def get_action(self, game_state):
+        """
+        Returns the minimax action from the current gameState using self.depth
+        and self.evaluationFunction.
+
+        Here are some method calls that might be useful when implementing minimax.
+
+        game_state.get_legal_actions(agent_index):
+            Returns a list of legal actions for an agent
+            agent_index=0 means our agent, the opponent is agent_index=1
+
+        Action.STOP:
+            The stop direction, which is always legal
+
+        game_state.generate_successor(agent_index, action):
+            Returns the successor game state after an agent takes an action
+        """
+        return self.minimax(game_state, self.depth, True)[ACTION]
+
+    def minimax(self, state, depth, maximizing_player):
         if depth == 0:
             return self.evaluation_function(state), Action.STOP
         legal_moves = state.get_legal_actions(int(not maximizing_player))
@@ -123,26 +143,6 @@ class MultiAgentSearchAgent(Agent):
             return min_value, argmin_action
 
 
-class MinmaxAgent(MultiAgentSearchAgent):
-    def get_action(self, game_state):
-        """
-        Returns the minimax action from the current gameState using self.depth
-        and self.evaluationFunction.
-
-        Here are some method calls that might be useful when implementing minimax.
-
-        game_state.get_legal_actions(agent_index):
-            Returns a list of legal actions for an agent
-            agent_index=0 means our agent, the opponent is agent_index=1
-
-        Action.STOP:
-            The stop direction, which is always legal
-
-        game_state.generate_successor(agent_index, action):
-            Returns the successor game state after an agent takes an action
-        """
-        return self.minimax(game_state, self.depth, True)[ACTION]
-
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -153,7 +153,39 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         Returns the minimax action using self.depth and self.evaluationFunction
         """
-        return self.minimax(game_state, self.depth, True, alpha_beta=True)[ACTION]
+        return self.minimax(game_state, self.depth, True, -inf, +inf)[ACTION]
+
+    def minimax(self, state, depth, maximizing_player, alpha, beta):
+        if depth == 0:
+            return self.evaluation_function(state), Action.STOP
+        legal_moves = state.get_legal_actions(int(not maximizing_player))
+        if maximizing_player:
+            max_value = -inf
+            argmax_action = Action.STOP
+            for action in legal_moves:
+                child_state = state.generate_successor(action=action)
+                value = self.minimax(child_state, depth, not maximizing_player, alpha, beta)[SCORE]
+                if value > max_value:
+                    max_value = value
+                    argmax_action = action
+                alpha = max(alpha, value)
+                if beta <= alpha:
+                    break
+            return max_value, argmax_action
+        else:
+            min_value = inf
+            argmin_action = Action.STOP
+            for action in legal_moves:
+                child_state = state.generate_successor(action=action, agent_index=1)
+                value = self.minimax(child_state, depth - 1, not maximizing_player, alpha, beta)[SCORE]
+                if value < min_value:
+                    min_value = value
+                    argmin_action = action  # actually we're not interested in it
+                beta = min(beta, value)
+                if beta <= alpha:
+                    break
+            return min_value, argmin_action
+
 
 
 
