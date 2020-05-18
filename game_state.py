@@ -84,7 +84,7 @@ class GameState(object):
     def apply_action(self, action):
         rotated_board = self._get_rotated_board_view(action)
         if not self._is_right_legal_action(rotated_board):
-            raise Exception("illegal action.")
+            raise Exception(f"illegal action:{action}")
         for row in range(self._num_of_rows):
             self._fuse_tiles_in_row(rotated_board, row)
             self._move_tiles_in_row(rotated_board, row)
