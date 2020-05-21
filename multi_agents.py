@@ -3,6 +3,7 @@ import abc
 import util
 from game import Agent, Action
 from math import inf
+from random import choice
 
 
 SCORE = 0
@@ -201,10 +202,32 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         The opponent should be modeled as choosing uniformly at random from their
         legal moves.
         """
-        """*** YOUR CODE HERE ***"""
-        util.raiseNotDefined()
+        return self.expectimax(game_state, self.depth, True)[ACTION]
 
-
+    def expectimax(self, state, depth, maximizing_player):
+        if depth == 0:
+            return self.evaluation_function(state), Action.STOP
+        legal_moves = state.get_legal_actions(int(not maximizing_player))
+        if len(legal_moves) == 0:
+            return inf, Action.STOP
+        if maximizing_player:
+            max_value = -inf
+            argmax_action = Action.STOP
+            for action in legal_moves:
+                child_state = state.generate_successor(action=action)
+                value = self.expectimax(child_state, depth, not maximizing_player)[SCORE]
+                if value > max_value:
+                    max_value = value
+                    argmax_action = action
+            if argmax_action == Action.STOP:
+                argmax_action = choice(legal_moves)
+            return max_value, argmax_action
+        else:
+            cumulative_value = 0
+            for action in legal_moves:
+                child_state = state.generate_successor(action=action, agent_index=1)
+                cumulative_value += self.expectimax(child_state, depth - 1, not maximizing_player)[SCORE]
+            return cumulative_value / len(legal_moves), choice(legal_moves)
 
 
 
