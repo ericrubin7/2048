@@ -9,6 +9,29 @@ from random import choice
 SCORE = 0
 ACTION = 1
 
+X = 0
+Y = 1
+
+INDICES_FLATTENED = np.indices((4, 4)).flatten().reshape(-1, 2)
+SNAKE_INDICES = np.array([
+    [3, 3],
+    [3, 2],
+    [3, 1],
+    [3, 0],
+    [2, 0],
+    [2, 1],
+    [2, 2],
+    [2, 3],
+    [1, 3],
+    [1, 2],
+    [1, 1],
+    [1, 0],
+    [0, 0],
+    [0, 1],
+    [0, 2],
+    [0, 3],
+])
+
 
 class ReflexAgent(Agent):
     """
@@ -122,6 +145,8 @@ class MinmaxAgent(MultiAgentSearchAgent):
         if depth == 0:
             return self.evaluation_function(state), Action.STOP
         legal_moves = state.get_legal_actions(int(not maximizing_player))
+        if len(legal_moves) == 0:
+            return inf, Action.STOP
         if maximizing_player:
             max_value = -inf
             argmax_action = Action.STOP
@@ -131,6 +156,8 @@ class MinmaxAgent(MultiAgentSearchAgent):
                 if value > max_value:
                     max_value = value
                     argmax_action = action
+            if argmax_action == Action.STOP:
+                argmax_action = choice(legal_moves)
             return max_value, argmax_action
         else:
             min_value = inf
@@ -160,6 +187,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         if depth == 0:
             return self.evaluation_function(state), Action.STOP
         legal_moves = state.get_legal_actions(int(not maximizing_player))
+        if len(legal_moves) == 0:
+            return inf, Action.STOP
         if maximizing_player:
             max_value = -inf
             argmax_action = Action.STOP
@@ -172,6 +201,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 alpha = max(alpha, value)
                 if beta <= alpha:
                     break
+            if argmax_action == Action.STOP:
+                argmax_action = choice(legal_moves)
             return max_value, argmax_action
         else:
             min_value = inf
@@ -237,8 +268,31 @@ def better_evaluation_function(current_game_state):
 
     DESCRIPTION: <write something here so we know what you did>
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # max_tile = current_game_state.max_tile
+    # board = current_game_state._board
+    # max_tiles_pos = np.argwhere(board == max_tile)
+    score = current_game_state.score
+    # side_benefit = 1    
+    # x_pos, y_pos = max_tiles_pos[-1]
+    # if x_pos == 0 or x_pos == 3:
+    #     side_benefit *= max_tile
+    # if y_pos == 0 or y_pos == 3:
+    #     side_benefit *= max_tile
+    # if x_pos == 3 and y_pos == 3:
+    #     side_benefit *= (max_tile ** 2)
+    # return score + side_benefit
+    board_flattened = current_game_state._board.flatten().reshape(-1, 1)
+    board_flat_w_ind = np.hstack((board_flattened, INDICES_FLATTENED))
+    sorted_board_w_ind_desc = board_flat_w_ind[board_flat_w_ind[:, 0].argsort()][::-1]
+    benefit = 1
+    for tile, snake_ind in zip(sorted_board_w_ind_desc, SNAKE_INDICES):
+        if tile[0] == 0:
+            break
+        if np.all(tile[1:] == snake_ind):
+            benefit *= tile[0]
+    return score + benefit
+    
+
 
 
 # Abbreviation
