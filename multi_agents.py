@@ -12,7 +12,25 @@ ACTION = 1
 X = 0
 Y = 1
 
-INDICES_FLATTENED = np.indices((4, 4)).flatten().reshape(-1, 2)
+# INDICES_FLATTENED = np.indices((4, 4)).flatten().reshape(-1, 2)
+INDICES_FLATTENED = np.array([
+    [0,0],
+    [0,1],
+    [0,2],
+    [0,3],
+    [1,0],
+    [1,1],
+    [1,2],
+    [1,3],
+    [2,0],
+    [2,1],
+    [2,2],
+    [2,3],
+    [3,0],
+    [3,1],
+    [3,2],
+    [3,3]
+])
 SNAKE_INDICES = np.array([
     [3, 3],
     [3, 2],
@@ -284,13 +302,15 @@ def better_evaluation_function(current_game_state):
     board_flattened = current_game_state._board.flatten().reshape(-1, 1)
     board_flat_w_ind = np.hstack((board_flattened, INDICES_FLATTENED))
     sorted_board_w_ind_desc = board_flat_w_ind[board_flat_w_ind[:, 0].argsort()][::-1]
-    benefit = 1
+    benefit = 0
     for tile, snake_ind in zip(sorted_board_w_ind_desc, SNAKE_INDICES):
         if tile[0] == 0:
             break
         if np.all(tile[1:] == snake_ind):
-            benefit *= tile[0]
-    return score + benefit
+            benefit += tile[0]
+        else:
+            break
+    return score+ benefit
     
 
 
