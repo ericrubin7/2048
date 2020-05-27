@@ -52,11 +52,6 @@ class Game(object):
         self.agent = agent
         self.display = display
         self.opponent_agent = opponent_agent
-        try:
-            self.agent.evaluation_function
-            self.ai = True
-        except AttributeError as e:
-            self.ai = False
         self._state = None
         self._should_quit = False
 

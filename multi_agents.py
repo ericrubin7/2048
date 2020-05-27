@@ -323,7 +323,7 @@ def better_evaluation_function(current_game_state):
             benefit += tile[0]
         else:
             break
-    return score+ benefit
+    return score+ benefit*2
     
 
 
