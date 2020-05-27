@@ -149,9 +149,6 @@ class MultiAgentSearchAgent(Agent):
     def __init__(self, evaluation_function='scoreEvaluationFunction', depth=2):
         self.evaluation_function = util.lookup(evaluation_function, globals())
         self.depth = depth
-        # TODO remove
-        self.init_depth = depth
-        self.all_actions = set((Action.UP, Action.DOWN, Action.LEFT, Action.RIGHT))
 
     @abc.abstractmethod
     def get_action(self, game_state):
@@ -219,10 +216,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         return self.minimax(game_state, self.depth, True, -inf, +inf)[ACTION]
 
-    def get_action_and_update_evals(self, game_state, values):
-        return self.minimax(game_state, self.depth, True, -inf, +inf, values=values)[ACTION]
-
-    def minimax(self, state, depth, maximizing_player, alpha, beta, values=None):
+    def minimax(self, state, depth, maximizing_player, alpha, beta):
         if depth == 0:
             return self.evaluation_function(state), Action.STOP
         legal_moves = state.get_legal_actions(int(not maximizing_player))
@@ -234,19 +228,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             for action in legal_moves:
                 child_state = state.generate_successor(action=action)
                 value = self.minimax(child_state, depth, not maximizing_player, alpha, beta)[SCORE]
-                # TODO remove
-                if values and depth == self.init_depth:
-                    values[action].set(value)
                 if value > max_value:
                     max_value = value
                     argmax_action = action
                 alpha = max(alpha, value)
                 if beta <= alpha:
                     break
-            # TODO remove
-            if values and depth == self.init_depth:
-                for action in self.all_actions - set(legal_moves):
-                    values[action].set(-1)
             if argmax_action == Action.STOP:
                 argmax_action = choice(legal_moves)
             return max_value, argmax_action
