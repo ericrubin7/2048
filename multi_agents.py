@@ -98,11 +98,26 @@ class ReflexAgent(Agent):
         board = successor_game_state.board
         max_tile = successor_game_state.max_tile
         score = successor_game_state.score
-        score_benefit = score/10
-        max_tile_benefit = max_tile*2
-        score += np.count_nonzero(board == 0) * score_benefit
-        score += np.count_nonzero(board == 0) * max_tile_benefit
-        return score
+        board_flattened = board.flatten().reshape(-1, 1)
+        board_flat_w_ind = np.hstack((board_flattened, INDICES_FLATTENED))
+        sorted_board_w_ind_desc = board_flat_w_ind[board_flat_w_ind[:, 0].argsort()][::-1]
+        benefit = 0
+        n_empty = np.count_nonzero(board == 0)
+        n_empty_multiplier = 0
+        if max_tile >= 128:
+            n_empty_multiplier += 1
+        if max_tile >= 256:
+            n_empty_multiplier += 1
+        if max_tile >= 512:
+            n_empty_multiplier += 2
+        for tile, snake_ind in zip(sorted_board_w_ind_desc, SNAKE_INDICES):
+            if tile[0] == 0:
+                break
+            if np.all(tile[1:] == snake_ind):
+                benefit += max_tile
+            else:
+                break
+        return score + benefit * 10 + n_empty * n_empty_multiplier
 
 
 def score_evaluation_function(current_game_state):
@@ -167,7 +182,7 @@ class MinmaxAgent(MultiAgentSearchAgent):
             return self.evaluation_function(state), Action.STOP
         legal_moves = state.get_legal_actions(int(not maximizing_player))
         if len(legal_moves) == 0:
-            return inf, Action.STOP
+            return -inf, Action.STOP
         if maximizing_player:
             max_value = -inf
             argmax_action = Action.STOP
@@ -212,7 +227,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             return self.evaluation_function(state), Action.STOP
         legal_moves = state.get_legal_actions(int(not maximizing_player))
         if len(legal_moves) == 0:
-            return inf, Action.STOP
+            return -inf, Action.STOP
         if maximizing_player:
             max_value = -inf
             argmax_action = Action.STOP
@@ -220,7 +235,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 child_state = state.generate_successor(action=action)
                 value = self.minimax(child_state, depth, not maximizing_player, alpha, beta)[SCORE]
                 # TODO remove
-                if depth == self.init_depth:
+                if values and depth == self.init_depth:
                     values[action].set(value)
                 if value > max_value:
                     max_value = value
@@ -229,7 +244,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 if beta <= alpha:
                     break
             # TODO remove
-            if depth == self.init_depth:
+            if values and depth == self.init_depth:
                 for action in self.all_actions - set(legal_moves):
                     values[action].set(-1)
             if argmax_action == Action.STOP:
@@ -271,7 +286,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             return self.evaluation_function(state), Action.STOP
         legal_moves = state.get_legal_actions(int(not maximizing_player))
         if len(legal_moves) == 0:
-            return inf, Action.STOP
+            return -inf, Action.STOP
         if maximizing_player:
             max_value = -inf
             argmax_action = Action.STOP
@@ -299,31 +314,28 @@ def better_evaluation_function(current_game_state):
 
     DESCRIPTION: <write something here so we know what you did>
     """
-    # max_tile = current_game_state.max_tile
-    # board = current_game_state._board
-    # max_tiles_pos = np.argwhere(board == max_tile)
+    max_tile = current_game_state.max_tile
     score = current_game_state.score
-    # side_benefit = 1    
-    # x_pos, y_pos = max_tiles_pos[-1]
-    # if x_pos == 0 or x_pos == 3:
-    #     side_benefit *= max_tile
-    # if y_pos == 0 or y_pos == 3:
-    #     side_benefit *= max_tile
-    # if x_pos == 3 and y_pos == 3:
-    #     side_benefit *= (max_tile ** 2)
-    # return score + side_benefit
     board_flattened = current_game_state._board.flatten().reshape(-1, 1)
     board_flat_w_ind = np.hstack((board_flattened, INDICES_FLATTENED))
     sorted_board_w_ind_desc = board_flat_w_ind[board_flat_w_ind[:, 0].argsort()][::-1]
     benefit = 0
+    n_empty = np.count_nonzero(current_game_state._board == 0)
+    n_empty_multiplier = 0
+    if max_tile >= 128:
+        n_empty_multiplier += 1
+    if max_tile >= 256:
+        n_empty_multiplier +=1
+    if max_tile >=512:
+        n_empty_multiplier +=2
     for tile, snake_ind in zip(sorted_board_w_ind_desc, SNAKE_INDICES):
         if tile[0] == 0:
             break
         if np.all(tile[1:] == snake_ind):
-            benefit += tile[0]
+            benefit += max_tile
         else:
             break
-    return score+ benefit*2
+    return score+ benefit*10 + n_empty*n_empty_multiplier
     
 
 

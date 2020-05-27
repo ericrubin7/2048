@@ -185,6 +185,10 @@ class GabrieleCirulli2048GraphicsDisplay(TK.Tk):
         self._keyboard_pressed_observers = []
         self._build_ui(human_agent)
 
+    def set_values(self, values):
+        for key in values.keys():
+            self.values[key].set(values[key])
+
     def _build_ui(self, human_agent):
         self.title("Intro to AI -- EX2")
         self.protocol("WM_DELETE_WINDOW", self.quit_app)
