@@ -25,6 +25,10 @@ class Agent(object):
     def get_action(self, game_state):
         return
 
+    @abc.abstractmethod
+    def get_action_and_update_evals(self, game_state, values):
+        return
+
     def stop_running(self):
         pass
 
@@ -48,6 +52,11 @@ class Game(object):
         self.agent = agent
         self.display = display
         self.opponent_agent = opponent_agent
+        try:
+            self.agent.evaluation_function
+            self.ai = True
+        except AttributeError as e:
+            self.ai = False
         self._state = None
         self._should_quit = False
 
@@ -67,7 +76,11 @@ class Game(object):
             if self.sleep_between_actions:
                 time.sleep(1)
             self.display.mainloop_iteration()
-            action = self.agent.get_action(self._state)
+            # action = self.agent.get_action(self._state)
+            action = self.agent.get_action_and_update_evals(
+                self._state,
+                self.display.get_values()
+            )
             if action == Action.STOP:
                 return
             self._state.apply_action(action)
