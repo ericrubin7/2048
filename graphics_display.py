@@ -133,9 +133,6 @@ class GameScore(ttk.Frame):
         self.score_label.pack(side=TK.LEFT)
         self.score_display = ttk.Label(self, textvariable=self._cvar)
         self.score_display.pack(side=TK.RIGHT)
-        
-
-
 
     # end def
 
@@ -172,22 +169,8 @@ class GabrieleCirulli2048GraphicsDisplay(TK.Tk):
         self._quit_game_callback = quit_game_callback
         self._padding = 10
         self.game_state = None
-        self.up_value = TK.IntVar()
-        self.down_value = TK.IntVar()
-        self.left_value = TK.IntVar()
-        self.right_value = TK.IntVar()
-        self.values = {
-            Action.UP: self.up_value,
-            Action.DOWN: self.down_value,
-            Action.LEFT: self.left_value,
-            Action.RIGHT: self.right_value,
-        }
         self._keyboard_pressed_observers = []
         self._build_ui(human_agent)
-
-    def set_values(self, values):
-        for key in values.keys():
-            self.values[key].set(values[key])
 
     def _build_ui(self, human_agent):
         self.title("Intro to AI -- EX2")
@@ -220,29 +203,6 @@ class GabrieleCirulli2048GraphicsDisplay(TK.Tk):
                                                                                           padx=self._padding,
                                                                                           pady=self._padding)
             ttk.Button(self, text="New Game", command=self._new_game_callback, state=TK.DISABLED).pack(side=TK.RIGHT)
-        up_label = ttk.Label(self, text='Up:')
-        up_label.pack(side=TK.LEFT)
-        # up_entry = ttk.Entry(self.ai_stats, text='0').grid(row=0, column=1)
-        up_value_label = ttk.Label(self, textvariable=self.values[Action.UP], width=6)
-        up_value_label.pack(side=TK.RIGHT)
-
-        down_label = ttk.Label(self, text='Down:')
-        down_label.pack(side=TK.LEFT)
-        down_value_label = ttk.Label(self, textvariable=self.values[Action.DOWN], width=6)
-        down_value_label.pack(side=TK.RIGHT)
-
-        left_label = ttk.Label(self, text='Left:')
-        left_label.pack(side=TK.LEFT)
-        left_value_label = ttk.Label(self, textvariable=self.values[Action.LEFT], width=6)
-        left_value_label.pack(side=TK.RIGHT)
-
-        right_label = ttk.Label(self, text='Right:')
-        right_label.pack(side=TK.LEFT)
-        right_value_label = ttk.Label(self, textvariable=self.values[Action.RIGHT], width=6)
-        right_value_label.pack(side=TK.RIGHT)
-
-    def get_values(self):
-        return self.values
 
     def center_window(self):
         r"""

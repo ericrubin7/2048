@@ -6,8 +6,6 @@ from game import Game, RandomOpponentAgent
 from game_state import GameState
 from graphics_display import GabrieleCirulli2048GraphicsDisplay
 from keyboard_agent import KeyboardAgent
-import tkinter as tk
-
 
 NUM_OF_INITIAL_TILES = 2
 
@@ -22,37 +20,12 @@ class GameRunner(object):
         if display is None:
             display = GabrieleCirulli2048GraphicsDisplay(self.new_game, self.quit_game, self.human_agent)
 
+        if agent is None:
+            agent = KeyboardAgent(display)
+
         self.display = display
         self._agent = agent
         self.current_game = None
-
-        self.ai_stats = None
-        if agent is None:
-            agent = KeyboardAgent(display)
-        # else:
-        #     self.ai_stats = tk.Tk()
-        #     self.ai_stats.geometry('+100+100')
-        #     up_label = tk.Label(self.ai_stats, text='Up:').grid(row=0, column=0)
-        #     up_value = tk.IntVar(0)
-        #     # up_entry = tk.Entry(self.ai_stats, text='0').grid(row=0, column=1)
-        #     up_value_label = tk.Label(self.ai_stats, textvariable=up_value).grid(row=0, column=1)
-
-        #     down_label = tk.Label(self.ai_stats, text='Down:').grid(row=1, column=0)
-        #     down_value = tk.IntVar(0)
-        #     down_value_label = tk.Label(self.ai_stats, textvariable=down_value).grid(row=1, column=1)
-
-        #     left_label = tk.Label(self.ai_stats, text='Left:').grid(row=2, column=0)
-        #     left_value = tk.IntVar(0)
-        #     left_value_label = tk.Label(self.ai_stats, textvariable=left_value).grid(row=2, column=1)
-
-        #     right_label = tk.Label(self.ai_stats, text='Right:').grid(row=3, column=0)
-        #     right_value = tk.IntVar(0)
-        #     right_value_label = tk.Label(self.ai_stats, textvariable=right_value).grid(row=3, column=1)
-        #     self.ai_stats.update_idletasks()
-        #     self.ai_stats.update()
-        #     right_value.set(1)
-
-
 
     def new_game(self, initial_state=None, *args, **kw):
         self.quit_game()

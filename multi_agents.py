@@ -12,6 +12,7 @@ ACTION = 1
 X = 0
 Y = 1
 
+# INDICES_FLATTENED = np.indices((4, 4)).flatten().reshape(-1, 2)
 INDICES_FLATTENED = np.array([
     [0,0],
     [0,1],
@@ -48,7 +49,6 @@ SNAKE_INDICES = np.array([
     [0, 2],
     [0, 3],
 ])
-CORNER = np.array([3, 3])
 
 
 class ReflexAgent(Agent):
@@ -333,11 +333,6 @@ def better_evaluation_function(current_game_state):
         n_empty_multiplier += 1
     if max_tile >= 512:
         n_empty_multiplier += 2
-    if max_tile >= 512 and sorted_board_w_ind_desc[1][0] >= 256 \
-        and np.all(sorted_board_w_ind_desc[0][1:] != CORNER):
-        penalty = max_tile
-    else:
-        penalty = 0
     for tile, snake_ind in zip(sorted_board_w_ind_desc, SNAKE_INDICES):
         if tile[0] == 0:
             break
@@ -345,10 +340,7 @@ def better_evaluation_function(current_game_state):
             benefit += max_tile
         else:
             break
-    benefit *= 10
-    penalty *= 10
-    return score + benefit + n_empty * n_empty_multiplier - penalty
-    # return score + benefit + n_empty * n_empty_multiplier
+    return score + benefit * 10 + n_empty * n_empty_multiplier
     
 
 
