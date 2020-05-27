@@ -312,7 +312,12 @@ def better_evaluation_function(current_game_state):
     """
     Your extreme 2048 evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    It basically gives the highest evaluation for board states that have
+    "snake" arrangement: starting from the (3, 3) corner, we check whether
+    it has the max tile, then - if (3, 2) has the second-to-max tile, then -
+    (3, 1), (3, 0), (2, 0), (2, 1) and so on.
+    Also, it counts the number of empty cells and uses it with an increasing
+    multiplier that depends on the current max_tile.
     """
     max_tile = current_game_state.max_tile
     score = current_game_state.score
@@ -328,7 +333,8 @@ def better_evaluation_function(current_game_state):
         n_empty_multiplier += 1
     if max_tile >= 512:
         n_empty_multiplier += 2
-    if np.all(sorted_board_w_ind_desc[0][1:] != CORNER):
+    if max_tile >= 512 and sorted_board_w_ind_desc[1][0] >= 256 \
+        and np.all(sorted_board_w_ind_desc[0][1:] != CORNER):
         penalty = max_tile
     else:
         penalty = 0
@@ -340,8 +346,9 @@ def better_evaluation_function(current_game_state):
         else:
             break
     benefit *= 10
-    penalty *= 20
+    penalty *= 10
     return score + benefit + n_empty * n_empty_multiplier - penalty
+    # return score + benefit + n_empty * n_empty_multiplier
     
 
 
